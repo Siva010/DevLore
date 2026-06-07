@@ -1,0 +1,120 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================
+// ENUMS
+// ============================================================
+
+enum ArticleStatus {
+  draft
+  published
+  scheduled
+}
+
+enum UserRole {
+  admin
+  editor
+}
+
+// ============================================================
+// MODELS
+// ============================================================
+
+model User {
+  id        String    @id @default(uuid())
+  email     String    @unique
+  name      String
+  role      UserRole  @default(editor)
+  avatarUrl String?   @map("avatar_url")
+  createdAt DateTime  @default(now()) @map("created_at")
+  articles  Article[]
+
+  @@map("users")
+}
+
+model Character {
+  id           String             @id @default(uuid())
+  slug         String             @unique
+  name         String
+  role         String
+  bio          String             @db.Text
+  avatarUrl    String?            @map("avatar_url")
+  personality  String             @db.Text
+  catchphrase  String             @db.Text
+  emoji        String             @default("🎭")
+  color        String             @default("#7c3aed")
+  createdAt    DateTime           @default(now()) @map("created_at")
+  articles     ArticleCharacter[]
+
+  @@map("characters")
+}
+
+model Tag {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  slug        String   @unique
+  description String?  @db.Text
+  articles    ArticleTag[]
+
+  @@map("tags")
+}
+
+model Article {
+  id          String           @id @default(uuid())
+  slug        String           @unique
+  title       String
+  subtitle    String           @db.Text
+  hook        String           @db.Text
+  content     String           @db.Text
+  status      ArticleStatus    @default(draft)
+  category    String
+  featured    Boolean          @default(false)
+  coverImage  String           @map("cover_image")
+  readingTime Int              @default(5) @map("reading_time")
+  authorId    String           @map("author_id")
+  publishedAt DateTime?        @map("published_at")
+  scheduledAt DateTime?        @map("scheduled_at")
+  createdAt   DateTime         @default(now()) @map("created_at")
+  updatedAt   DateTime         @updatedAt @map("updated_at")
+
+  author      User             @relation(fields: [authorId], references: [id])
+  characters  ArticleCharacter[]
+  tags        ArticleTag[]
+
+  // Full-text search vector (PostgreSQL)
+  @@index([status])
+  @@index([category])
+  @@index([featured])
+  @@index([publishedAt(sort: Desc)])
+  @@map("articles")
+}
+
+// Join tables
+model ArticleCharacter {
+  articleId   String    @map("article_id")
+  characterId String    @map("character_id")
+  article     Article   @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  character   Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  @@id([articleId, characterId])
+  @@map("article_characters")
+}
+
+model ArticleTag {
+  articleId String  @map("article_id")
+  tagId     String  @map("tag_id")
+  article   Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  tag       Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([articleId, tagId])
+  @@map("article_tags")
+}
