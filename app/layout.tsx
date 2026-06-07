@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { buildMetadata } from "@/lib/seo";
 
@@ -36,7 +35,6 @@ export default function RootLayout({
         />
       </head>
       <body>
-        <Navbar />
         <main>{children}</main>
         <Footer />
       </body>

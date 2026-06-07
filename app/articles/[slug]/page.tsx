@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { Clock, ArrowLeft, Calendar } from "lucide-react";
+import { Clock, ArrowLeft, Calendar, ArrowRight } from "lucide-react";
 import { type Metadata } from "next";
 import { getArticleBySlug, ARTICLES } from "@/lib/data";
 import { buildArticleMetadata, buildArticleJsonLd, SITE_URL } from "@/lib/seo";
@@ -14,7 +14,16 @@ import {
   InterviewQuestion, ComicStrip, QuickRevision, MemeSection
 } from "@/components/comic/ComicComponents";
 
-// Article MDX content — inline for MVP (would come from DB/files in production)
+const CATEGORY_COLORS: Record<string, string> = {
+  "AI & LLMs":            "cat-ai",
+  "Backend Engineering":  "cat-backend",
+  "Databases":            "cat-databases",
+  "System Design":        "cat-system-design",
+  "Networking":           "cat-networking",
+  "Developer Humor":      "cat-humor",
+};
+
+// Article MDX content — inline for MVP
 const ARTICLE_CONTENT: Record<string, React.ReactNode> = {
   "https-tls-nightclub-bouncer": (
     <>
@@ -34,7 +43,7 @@ const ARTICLE_CONTENT: Record<string, React.ReactNode> = {
       </CharacterQuote>
 
       <h3>Step 1: Client Hello</h3>
-      <p>Your browser sends a "hello" to the server with a list of cipher suites it supports — basically saying <em>"here are the encryption algorithms I know. Pick one."</em></p>
+      <p>Your browser sends a &ldquo;hello&rdquo; to the server with a list of cipher suites it supports — basically saying <em>&ldquo;here are the encryption algorithms I know. Pick one.&rdquo;</em></p>
 
       <h3>Step 2: Server Hello + Certificate</h3>
       <p>The server responds with the cipher suite it chose and hands over its <strong>SSL/TLS certificate</strong>. This certificate is like a government-issued ID.</p>
@@ -115,9 +124,7 @@ const ARTICLE_CONTENT: Record<string, React.ReactNode> = {
       <p>
         A transaction is an atomic unit. Either <strong>everything succeeds</strong> or <strong>nothing is applied</strong>.
       </p>
-      <p>
-        Transfer $100 from Account A to Account B:
-      </p>
+      <p>Transfer $100 from Account A to Account B:</p>
       <ul>
         <li>Debit Account A: $100 ✓</li>
         <li>Credit Account B: $100 ✗ (server crashes)</li>
@@ -174,7 +181,7 @@ const ARTICLE_CONTENT: Record<string, React.ReactNode> = {
         Tuesday, 2:47 PM. Larry Load Balancer is having what he would later describe as &ldquo;the worst day of my professional career.&rdquo; Server 1 is at 94% CPU. Servers 2, 3, and 4 are sitting at 12%. Why? Because Larry&apos;s predecessor had literally hardcoded every user to Server 1. Larry took over at 2:30 PM. He fixed it by 2:48 PM. He has not forgiven that developer.
       </StoryPanel>
 
-      <CharacterQuote character="Larry Load Balancer" emoji="⚖️" color="var(--color-purple)">
+      <CharacterQuote character="Larry Load Balancer" emoji="⚖️" color="var(--color-accent)">
         Nobody gets overloaded on my watch. That is a promise and a threat.
       </CharacterQuote>
 
@@ -255,6 +262,7 @@ export default async function ArticlePage({ params }: PageProps) {
   if (!article) notFound();
 
   const catMeta = CATEGORIES.find((c) => c.name === article.category);
+  const catColorClass = CATEGORY_COLORS[article.category] ?? "badge-default";
   const relatedArticles = ARTICLES.filter(
     (a) => a.slug !== slug && a.status === "published" && a.category === article.category
   ).slice(0, 3);
@@ -272,12 +280,14 @@ export default async function ArticlePage({ params }: PageProps) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      {/* HERO */}
+      {/* ============================================================
+          ARTICLE HERO
+          ============================================================ */}
       <div
         style={{
           position: "relative",
           overflow: "hidden",
-          minHeight: 420,
+          minHeight: "480px",
           display: "flex",
           alignItems: "flex-end",
         }}
@@ -287,95 +297,162 @@ export default async function ArticlePage({ params }: PageProps) {
           alt={article.title}
           fill
           priority
-          style={{ objectFit: "cover", filter: "brightness(0.35)" }}
+          style={{ objectFit: "cover", filter: "brightness(0.28) saturate(0.8)" }}
           sizes="100vw"
         />
+        {/* Gradient overlay */}
         <div
           style={{
-            position: "absolute", inset: 0,
-            background: "linear-gradient(to top, rgba(15,14,23,0.95) 0%, rgba(15,14,23,0.3) 100%)",
+            position: "absolute",
+            inset: 0,
+            background: "linear-gradient(to top, rgba(0,0,0,0.97) 0%, rgba(0,0,0,0.4) 60%, transparent 100%)",
           }}
         />
-        <div className="container" style={{ position: "relative", paddingTop: "5rem", paddingBottom: "3rem", zIndex: 1 }}>
+        <div
+          className="container"
+          style={{ position: "relative", paddingTop: "5rem", paddingBottom: "3.5rem", zIndex: 1 }}
+        >
           <Link
             href="/"
-            className="btn btn-ghost"
-            style={{ color: "rgba(255,255,255,0.7)", marginBottom: "1.5rem", padding: "6px 12px", fontSize: "0.82rem" }}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "5px",
+              color: "rgba(255,255,255,0.45)",
+              fontSize: "0.78rem",
+              fontWeight: 500,
+              marginBottom: "2rem",
+              transition: "color var(--transition-fast)",
+            }}
+            className="back-link"
           >
-            <ArrowLeft size={14} /> Back to DevLore
+            <ArrowLeft size={13} /> Back to DevLore
           </Link>
 
-          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "1rem", flexWrap: "wrap" }}>
-            <span className="badge" style={{ background: "rgba(255,255,255,0.12)", color: "white", border: "1px solid rgba(255,255,255,0.2)" }}>
+          {/* Tags row */}
+          <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "1.25rem", flexWrap: "wrap" }}>
+            <span
+              className={`badge ${catColorClass}`}
+              style={{ fontSize: "0.67rem" }}
+            >
               {catMeta?.emoji} {article.category}
             </span>
             {article.tags.slice(0, 3).map((tag) => (
-              <span key={tag} className="badge" style={{ background: "rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.65)", border: "1px solid rgba(255,255,255,0.12)", fontSize: "0.65rem" }}>
+              <span
+                key={tag}
+                className="badge"
+                style={{
+                  background: "rgba(255,255,255,0.07)",
+                  color: "rgba(255,255,255,0.55)",
+                  borderColor: "rgba(255,255,255,0.12)",
+                  fontSize: "0.62rem",
+                }}
+              >
                 {tag}
               </span>
             ))}
           </div>
 
+          {/* Title */}
           <h1
-            className="font-display"
             style={{
-              fontSize: "clamp(1.75rem, 5vw, 3rem)",
-              fontWeight: 900,
+              fontFamily: "var(--font-display)",
+              fontSize: "clamp(1.75rem, 5vw, 3.25rem)",
+              fontWeight: 800,
               color: "white",
-              lineHeight: 1.1,
-              maxWidth: "800px",
-              marginBottom: "1rem",
+              lineHeight: 1.08,
+              letterSpacing: "-0.03em",
+              maxWidth: "820px",
+              marginBottom: "1.1rem",
             }}
           >
             {article.title}
           </h1>
 
-          <p style={{ color: "rgba(255,255,255,0.7)", fontSize: "1.1rem", maxWidth: "680px", lineHeight: 1.6, marginBottom: "1.5rem" }}>
+          {/* Subtitle */}
+          <p
+            style={{
+              color: "rgba(255,255,255,0.6)",
+              fontSize: "1rem",
+              maxWidth: "640px",
+              lineHeight: 1.7,
+              marginBottom: "1.75rem",
+            }}
+          >
             {article.subtitle}
           </p>
 
-          <div style={{ display: "flex", alignItems: "center", gap: "1.25rem", flexWrap: "wrap" }}>
+          {/* Meta row */}
+          <div style={{ display: "flex", alignItems: "center", gap: "1.5rem", flexWrap: "wrap" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-              <div style={{ width: 32, height: 32, borderRadius: "50%", background: "rgba(255,255,255,0.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.85rem" }}>
+              <div
+                style={{
+                  width: 30,
+                  height: 30,
+                  borderRadius: "50%",
+                  background: "rgba(255,255,255,0.1)",
+                  border: "1px solid rgba(255,255,255,0.15)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: "0.85rem",
+                }}
+              >
                 ✍️
               </div>
-              <span style={{ color: "rgba(255,255,255,0.8)", fontSize: "0.875rem" }}>{article.author.name}</span>
+              <span style={{ color: "rgba(255,255,255,0.7)", fontSize: "0.82rem" }}>
+                {article.author.name}
+              </span>
             </div>
-            <span style={{ display: "flex", alignItems: "center", gap: "5px", color: "rgba(255,255,255,0.6)", fontSize: "0.8rem" }}>
-              <Calendar size={13} />
+            <span
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "4px",
+                color: "rgba(255,255,255,0.45)",
+                fontSize: "0.78rem",
+              }}
+            >
+              <Calendar size={12} />
               {article.publishedAt ? format(new Date(article.publishedAt), "MMM d, yyyy") : "Draft"}
             </span>
-            <span style={{ display: "flex", alignItems: "center", gap: "5px", color: "rgba(255,255,255,0.6)", fontSize: "0.8rem" }}>
-              <Clock size={13} />
+            <span
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "4px",
+                color: "rgba(255,255,255,0.45)",
+                fontSize: "0.78rem",
+              }}
+            >
+              <Clock size={12} />
               {article.readingTime} min read
             </span>
           </div>
         </div>
       </div>
 
-      {/* CONTENT AREA */}
-      <div className="container" style={{ paddingTop: "3rem", paddingBottom: "4rem" }}>
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr",
-            gap: "3rem",
-          }}
-          className="article-layout"
-        >
-          {/* Main Content */}
-          <article>
-            {/* Opening hook */}
+      {/* ============================================================
+          CONTENT AREA
+          ============================================================ */}
+      <div className="container" style={{ paddingTop: "3.5rem", paddingBottom: "5rem" }}>
+        <div className="article-layout">
+          {/* ── Main Content ── */}
+          <article style={{ minWidth: 0 }}>
+            {/* Opening hook blockquote */}
             <blockquote
               style={{
                 fontFamily: "var(--font-display)",
                 fontSize: "1.2rem",
                 fontStyle: "italic",
-                lineHeight: 1.65,
-                color: "var(--color-text-primary)",
-                borderLeft: "3px solid var(--color-accent)",
-                paddingLeft: "1.25rem",
-                marginBottom: "2.5rem",
+                lineHeight: 1.7,
+                color: "var(--color-text-1)",
+                borderLeft: "2px solid var(--color-accent)",
+                paddingLeft: "1.5rem",
+                marginBottom: "3rem",
+                background: "var(--color-accent-subtle)",
+                padding: "1.25rem 1.5rem",
+                borderRadius: "0 var(--radius-md) var(--radius-md) 0",
               }}
             >
               {article.hook}
@@ -386,17 +463,27 @@ export default async function ArticlePage({ params }: PageProps) {
               <div
                 style={{
                   display: "flex",
-                  gap: "10px",
+                  gap: "8px",
                   flexWrap: "wrap",
                   padding: "1rem 1.25rem",
                   background: "var(--color-surface-2)",
                   borderRadius: "var(--radius-md)",
                   border: "1px solid var(--color-border)",
-                  marginBottom: "2.5rem",
+                  marginBottom: "3rem",
                   alignItems: "center",
                 }}
               >
-                <span style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", fontWeight: 600 }}>Characters in this story:</span>
+                <span
+                  style={{
+                    fontSize: "0.68rem",
+                    color: "var(--color-text-3)",
+                    fontWeight: 600,
+                    textTransform: "uppercase",
+                    letterSpacing: "0.06em",
+                  }}
+                >
+                  Characters in this story
+                </span>
                 {article.characters.map((char) => (
                   <Link key={char.slug} href={`/characters/${char.slug}`} style={{ textDecoration: "none" }}>
                     <span
@@ -406,12 +493,14 @@ export default async function ArticlePage({ params }: PageProps) {
                         gap: "5px",
                         padding: "3px 10px",
                         borderRadius: "var(--radius-pill)",
-                        background: `${char.color}18`,
-                        border: `1px solid ${char.color}35`,
-                        fontSize: "0.78rem",
+                        background: `${char.color}10`,
+                        border: `1px solid ${char.color}30`,
+                        fontSize: "0.75rem",
                         fontWeight: 600,
                         color: char.color,
+                        transition: "all var(--transition-fast)",
                       }}
+                      className="char-tag"
                     >
                       {char.emoji} {char.name}
                     </span>
@@ -420,23 +509,34 @@ export default async function ArticlePage({ params }: PageProps) {
               </div>
             )}
 
-            {/* MDX Content */}
+            {/* Article prose content */}
             <div className="prose">
               {ARTICLE_CONTENT[slug] ?? (
-                <p style={{ color: "var(--color-text-muted)", fontStyle: "italic" }}>
+                <p style={{ color: "var(--color-text-3)", fontStyle: "italic" }}>
                   Content coming soon...
                 </p>
               )}
             </div>
 
             {/* Tags */}
-            <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginTop: "3rem", paddingTop: "2rem", borderTop: "1px solid var(--color-border)" }}>
+            <div
+              style={{
+                display: "flex",
+                gap: "6px",
+                flexWrap: "wrap",
+                marginTop: "3.5rem",
+                paddingTop: "2rem",
+                borderTop: "1px solid var(--color-border)",
+              }}
+            >
               {article.tags.map((tag) => (
-                <span key={tag} className="badge badge-muted">{tag}</span>
+                <span key={tag} className="badge badge-default">
+                  {tag}
+                </span>
               ))}
             </div>
 
-            {/* Share */}
+            {/* Share section */}
             <div
               style={{
                 display: "flex",
@@ -445,22 +545,21 @@ export default async function ArticlePage({ params }: PageProps) {
                 flexWrap: "wrap",
                 gap: "1rem",
                 marginTop: "2rem",
-                padding: "1.25rem",
+                padding: "1.25rem 1.5rem",
                 background: "var(--color-surface-2)",
-                borderRadius: "var(--radius-md)",
+                borderRadius: "var(--radius-lg)",
                 border: "1px solid var(--color-border)",
               }}
             >
-              <span style={{ fontSize: "0.875rem", color: "var(--color-text-secondary)" }}>
-                Enjoyed this story? Share it 👇
+              <span style={{ fontSize: "0.82rem", color: "var(--color-text-2)", fontWeight: 500 }}>
+                Found this useful? Share it 👇
               </span>
               <ShareButtons title={article.title} url={articleUrl} />
             </div>
           </article>
 
-          {/* Sidebar */}
+          {/* ── Sidebar ── */}
           <aside>
-            {/* Related Articles */}
             {relatedArticles.length > 0 && (
               <div
                 style={{
@@ -472,34 +571,85 @@ export default async function ArticlePage({ params }: PageProps) {
                   top: "80px",
                 }}
               >
-                <h3 className="font-display" style={{ fontSize: "1rem", fontWeight: 700, marginBottom: "1.25rem" }}>
+                <h3
+                  style={{
+                    fontFamily: "var(--font-display)",
+                    fontSize: "0.85rem",
+                    fontWeight: 700,
+                    letterSpacing: "-0.01em",
+                    color: "var(--color-text-1)",
+                    marginBottom: "1.25rem",
+                    paddingBottom: "0.75rem",
+                    borderBottom: "1px solid var(--color-border)",
+                  }}
+                >
                   Related Stories
                 </h3>
-                <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "1px" }}>
                   {relatedArticles.map((rel) => (
-                    <Link key={rel.slug} href={`/articles/${rel.slug}`} style={{ textDecoration: "none" }}>
+                    <Link
+                      key={rel.slug}
+                      href={`/articles/${rel.slug}`}
+                      style={{ textDecoration: "none" }}
+                    >
                       <div
+                        className="related-item"
                         style={{
                           display: "flex",
                           gap: "10px",
-                          padding: "10px",
+                          padding: "0.75rem",
                           borderRadius: "var(--radius-md)",
                           transition: "background var(--transition-fast)",
                           cursor: "pointer",
                         }}
-                        className="related-item"
                       >
-                        <div style={{ position: "relative", width: 60, height: 45, borderRadius: "var(--radius-sm)", overflow: "hidden", flexShrink: 0 }}>
-                          <Image src={rel.coverImage} alt={rel.title} fill style={{ objectFit: "cover" }} sizes="60px" />
+                        <div
+                          style={{
+                            position: "relative",
+                            width: 56,
+                            height: 42,
+                            borderRadius: "var(--radius-sm)",
+                            overflow: "hidden",
+                            flexShrink: 0,
+                          }}
+                        >
+                          <Image
+                            src={rel.coverImage}
+                            alt={rel.title}
+                            fill
+                            style={{ objectFit: "cover" }}
+                            sizes="56px"
+                          />
                         </div>
-                        <div>
-                          <h4 style={{ fontSize: "0.82rem", fontWeight: 600, lineHeight: 1.35, color: "var(--color-text-primary)", marginBottom: "4px" }}>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <h4
+                            style={{
+                              fontSize: "0.78rem",
+                              fontWeight: 600,
+                              lineHeight: 1.35,
+                              color: "var(--color-text-1)",
+                              marginBottom: "3px",
+                              display: "-webkit-box",
+                              WebkitLineClamp: 2,
+                              WebkitBoxOrient: "vertical",
+                              overflow: "hidden",
+                            }}
+                          >
                             {rel.title}
                           </h4>
-                          <span style={{ fontSize: "0.72rem", color: "var(--color-text-muted)", display: "flex", alignItems: "center", gap: "3px" }}>
+                          <span
+                            style={{
+                              fontSize: "0.68rem",
+                              color: "var(--color-text-3)",
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "3px",
+                            }}
+                          >
                             <Clock size={10} /> {rel.readingTime} min
                           </span>
                         </div>
+                        <ArrowRight size={12} style={{ color: "var(--color-text-3)", flexShrink: 0, marginTop: "3px" }} />
                       </div>
                     </Link>
                   ))}
@@ -511,14 +661,25 @@ export default async function ArticlePage({ params }: PageProps) {
       </div>
 
       <style>{`
-        @media (min-width: 900px) {
+        .back-link:hover { color: rgba(255,255,255,0.75) !important; }
+        .char-tag:hover { opacity: 0.8; }
+
+        .article-layout {
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 2rem;
+          max-width: 1100px;
+          margin: 0 auto;
+        }
+
+        @media (min-width: 1024px) {
           .article-layout {
-            grid-template-columns: 1fr 300px !important;
+            grid-template-columns: 1fr 280px !important;
+            gap: 4rem;
           }
         }
-        .related-item:hover {
-          background: var(--color-surface-2);
-        }
+
+        .related-item:hover { background: var(--color-surface-2); }
       `}</style>
     </>
   );
