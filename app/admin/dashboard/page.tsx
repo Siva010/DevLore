@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { FileText, TrendingUp, Clock, Star, Plus, Edit3, BarChart3, Users } from "lucide-react";
+import { FileText, TrendingUp, Clock, Star, Plus, Edit3, Users } from "lucide-react";
 import { ARTICLES, CHARACTERS } from "@/lib/data";
 
 export default function AdminDashboard() {

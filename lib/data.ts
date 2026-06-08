@@ -194,6 +194,7 @@ export const ARTICLES: Article[] = [
 // ============================================================
 
 export function toArticleCard(a: Article): ArticleCard {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { content, characters, ...card } = a;
   return card;
 }

@@ -1,6 +1,5 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
 import { Clock, ArrowLeft, ArrowRight } from "lucide-react";
 import { type Metadata } from "next";
 import { getCharacterBySlug, getArticlesByCharacter, CHARACTERS } from "@/lib/data";

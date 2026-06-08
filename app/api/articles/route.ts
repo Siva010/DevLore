@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import {
-  ARTICLES,
   getArticleBySlug,
   toArticleCard,
   getRecentArticles,

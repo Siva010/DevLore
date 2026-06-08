@@ -1,10 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowRight, Clock, Sparkles, Moon, Sun } from "lucide-react";
+import { Clock, Sparkles, Moon, Sun } from "lucide-react";
 import { motion, Variants } from "framer-motion";
 import { getRecentArticles, CHARACTERS, toArticleCard } from "@/lib/data";
 import { CATEGORIES, type ArticleCard } from "@/types";
@@ -35,8 +34,9 @@ function BeginCard({ article }: { article: ArticleCard }) {
         className="begin-card"
         style={{
           borderRadius: "var(--radius-lg)",
-          border: "1px solid var(--color-border)",
+          border: "2px solid var(--color-text-1)",
           background: "var(--color-surface)",
+          boxShadow: "var(--shadow-md)",
           overflow: "hidden",
           cursor: "pointer",
           height: "100%",
@@ -44,8 +44,8 @@ function BeginCard({ article }: { article: ArticleCard }) {
           flexDirection: "column",
         }}
       >
-        {/* Cover - Kept blank */}
-        <div style={{ position: "relative", aspectRatio: "4/3", overflow: "hidden", flexShrink: 0, background: "var(--color-surface-2)" }}>
+        {/* Cover - TV Static */}
+        <div className="tv-static" style={{ position: "relative", aspectRatio: "4/3", overflow: "hidden", flexShrink: 0, background: "var(--color-surface-2)" }}>
         </div>
         {/* Body */}
         <div style={{ padding: "0.9rem 1rem", flex: 1, display: "flex", flexDirection: "column", gap: "0.4rem" }}>
@@ -66,7 +66,7 @@ function BeginCard({ article }: { article: ArticleCard }) {
               fontSize: "0.875rem",
               fontWeight: 700,
               lineHeight: 1.25,
-              letterSpacing: "-0.01em",
+              letterSpacing: "0.08em",
               color: "var(--color-text-1)",
               display: "-webkit-box",
               WebkitLineClamp: 2,
@@ -106,7 +106,11 @@ export default function HomePage() {
   const router = useRouter();
 
   useEffect(() => {
-    setIsDark(document.documentElement.classList.contains("dark"));
+    const isThemeDark = document.documentElement.classList.contains("dark");
+    const frame = requestAnimationFrame(() => {
+      setIsDark(isThemeDark);
+    });
+    return () => cancelAnimationFrame(frame);
   }, []);
 
   const handleSearch = (e: React.FormEvent) => {
@@ -236,7 +240,7 @@ export default function HomePage() {
                   fontFamily: "var(--font-display)",
                   fontSize: "clamp(2rem, 4vw, 3.25rem)",
                   fontWeight: 800,
-                  letterSpacing: "-0.04em",
+                  letterSpacing: "0.08em",
                   color: "var(--color-text-1)",
                   lineHeight: 1,
                   display: "block",
@@ -263,7 +267,7 @@ export default function HomePage() {
                   fontFamily: "var(--font-display)",
                   fontSize: "clamp(2rem, 4vw, 3.25rem)",
                   fontWeight: 800,
-                  letterSpacing: "-0.04em",
+                  letterSpacing: "0.08em",
                   color: "var(--color-text-1)",
                   lineHeight: 1,
                   display: "block",
@@ -299,7 +303,7 @@ export default function HomePage() {
               fontSize: "clamp(1.25rem, 3.5vw, 2rem)",
               fontWeight: 700,
               lineHeight: 1.35,
-              letterSpacing: "-0.03em",
+              letterSpacing: "0.08em",
               color: "var(--color-text-1)",
               margin: 0,
               fontStyle: "normal",
@@ -433,7 +437,7 @@ export default function HomePage() {
                   fontFamily: "var(--font-display)",
                   fontSize: "clamp(2rem, 4vw, 3rem)",
                   fontWeight: 800,
-                  letterSpacing: "-0.03em",
+                  letterSpacing: "0.08em",
                   color: "var(--color-text-1)",
                   marginBottom: "2rem",
                 }}
@@ -451,16 +455,16 @@ export default function HomePage() {
                   <motion.li key={cat.slug} variants={listItemVariants} whileHover={{ x: 5 }}>
                     <Link
                       href={`/topics/${cat.slug}`}
-                      className="tc-link"
+                      className="card"
                       style={{
                         textDecoration: "none",
                         display: "flex",
                         alignItems: "center",
                         gap: "0.5rem",
-                        fontSize: "1.25rem",
-                        color: "var(--color-text-2)",
+                        fontSize: "1.4rem",
+                        color: "var(--color-text-1)",
                         fontFamily: "var(--font-mono)",
-                        transition: "color var(--transition-fast)",
+                        padding: "0.6rem 1.5rem",
                       }}
                     >
                       {cat.name}
@@ -477,7 +481,7 @@ export default function HomePage() {
                   fontFamily: "var(--font-display)",
                   fontSize: "clamp(2rem, 4vw, 3rem)",
                   fontWeight: 800,
-                  letterSpacing: "-0.03em",
+                  letterSpacing: "0.08em",
                   color: "var(--color-text-1)",
                   marginBottom: "2rem",
                 }}
@@ -495,16 +499,16 @@ export default function HomePage() {
                   <motion.li key={char.slug} variants={listItemVariants} whileHover={{ x: 5 }}>
                     <Link
                       href={`/characters/${char.slug}`}
-                      className="tc-link"
+                      className="card"
                       style={{
                         textDecoration: "none",
                         display: "flex",
                         alignItems: "center",
                         gap: "0.5rem",
-                        fontSize: "1.25rem",
-                        color: "var(--color-text-2)",
+                        fontSize: "1.4rem",
+                        color: "var(--color-text-1)",
                         fontFamily: "var(--font-mono)",
-                        transition: "color var(--transition-fast)",
+                        padding: "0.6rem 1.5rem",
                       }}
                     >
                       {char.name}
@@ -532,10 +536,10 @@ export default function HomePage() {
               margin: "0 auto",
               borderRadius: "var(--radius-xl)",
               background: "var(--color-surface)",
-              border: "1px solid var(--color-border)",
+              border: "2px solid var(--color-text-1)",
               padding: "3.5rem 2.5rem",
               textAlign: "center",
-              boxShadow: "var(--shadow-sm)",
+              boxShadow: "var(--shadow-lg)",
             }}
           >
             {/* Badge */}
@@ -551,7 +555,7 @@ export default function HomePage() {
                 fontFamily: "var(--font-display)",
                 fontSize: "clamp(1.75rem, 4vw, 2.5rem)",
                 fontWeight: 800,
-                letterSpacing: "-0.04em",
+                letterSpacing: "0.08em",
                 color: "var(--color-text-1)",
                 marginBottom: "0.75rem",
                 lineHeight: 1.1,

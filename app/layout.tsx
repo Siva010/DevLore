@@ -34,7 +34,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body>
+      <body className="vt323-regular">
         <main>{children}</main>
         <Footer />
       </body>

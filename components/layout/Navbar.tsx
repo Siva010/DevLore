@@ -12,9 +12,13 @@ export default function Navbar() {
 
   useEffect(() => {
     const saved = localStorage.getItem("devlore-theme");
-    if (saved === "dark" || (!saved && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
-      setDark(true);
+    const isThemeDark = saved === "dark" || (!saved && window.matchMedia("(prefers-color-scheme: dark)").matches);
+    if (isThemeDark) {
+      const frame = requestAnimationFrame(() => {
+        setDark(true);
+      });
       document.documentElement.classList.add("dark");
+      return () => cancelAnimationFrame(frame);
     }
   }, []);
 

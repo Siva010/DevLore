@@ -6,12 +6,12 @@ import { type Metadata } from "next";
 import { getArticleBySlug, ARTICLES } from "@/lib/data";
 import { buildArticleMetadata, buildArticleJsonLd, SITE_URL } from "@/lib/seo";
 import { CATEGORIES } from "@/types";
-import { formatDistanceToNow, format } from "date-fns";
+import { format } from "date-fns";
 import ReadingProgressBar from "@/components/reader/ReadingProgressBar";
 import ShareButtons from "@/components/reader/ShareButtons";
 import {
   StoryPanel, FunFact, CommonMistake, CharacterQuote,
-  InterviewQuestion, ComicStrip, QuickRevision, MemeSection
+  InterviewQuestion, ComicStrip, QuickRevision
 } from "@/components/comic/ComicComponents";
 
 const CATEGORY_COLORS: Record<string, string> = {

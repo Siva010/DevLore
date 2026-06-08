@@ -2,7 +2,6 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { Search, Clock, X, ArrowRight } from "lucide-react";
 import { ARTICLES, CHARACTERS } from "@/lib/data";
 import { CATEGORIES } from "@/types";

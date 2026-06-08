@@ -1,5 +1,5 @@
 import { type Metadata } from "next";
-import { Article, ArticleCard, Category } from "@/types";
+import { Article, ArticleCard } from "@/types";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://devlore.io";
 const SITE_NAME = "DevLore";
